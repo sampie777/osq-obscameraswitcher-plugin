@@ -32,14 +32,13 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
 
     override val name = "ObsCameraSwitcherPlugin"
     override val description = "Plugin to switch cameras in OBS"
-    override val version: String = "0.0.0"
+    override val version: String = PluginInfo.version
 
     override val icon: Icon? = createImageIcon("/plugins/obs/icon-14.png")
 
     override val tabName = "OBS Camera Switcher"
 
     internal val quickAccessColor = Color(255, 229, 229)
-    private val cameraSceneName = "Cameras"
     private val cameraSourcesList: JList<ObsCameraSwitchQueItem> = DefaultSourcesList()
     private var cameraScene: TScene? = null
 
@@ -97,10 +96,10 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
     }
 
     override fun refreshScenes() {
-        cameraScene = OBSState.scenes.find { it.name == cameraSceneName }
+        cameraScene = OBSState.scenes.find { it.name == PluginProperties.cameraSceneName }
         if (cameraScene == null) {
-            logger.info("Could not find camera scene: $cameraSceneName")
-            Notifications.add("Could not find camera scene: $cameraSceneName", "OBS Camera Switcher")
+            logger.info("Could not find camera scene: ${PluginProperties.cameraSceneName}")
+            Notifications.add("Could not find camera scene: ${PluginProperties.cameraSceneName}", "OBS Camera Switcher")
             return
         }
 
@@ -126,7 +125,7 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         cameraScene!!.sources
                 .filter { it.name != exceptSourceName }
                 .forEach {
-                    controller.setSourceVisibility(cameraSceneName, it.name, false) {}
+                    controller.setSourceVisibility(PluginProperties.cameraSceneName, it.name, false) {}
                 }
     }
 
@@ -139,7 +138,7 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         }
 
         if (PluginProperties.switchUsingVisibility) {
-            controller.setSourceVisibility(cameraSceneName, sourceName, true) {
+            controller.setSourceVisibility(PluginProperties.cameraSceneName, sourceName, true) {
                 hideAllCameras(exceptSourceName = sourceName)
             }
         } else {
@@ -153,7 +152,7 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
 
             val obsItems = sources.map { ReorderSceneItemsRequest(null, null, null).Item(null, it.name) }
 
-            controller.reorderSceneItems(cameraSceneName, obsItems) {}
+            controller.reorderSceneItems(PluginProperties.cameraSceneName, obsItems) {}
         }
     }
 }
