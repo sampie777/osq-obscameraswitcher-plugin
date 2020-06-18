@@ -1,21 +1,17 @@
 package nl.sajansen.obscameraswitcher.queItems
 
-import objects.OBSClient
-import objects.OBSState
-import objects.TScene
-import objects.que.Que
-import objects.que.QueItem
 import nl.sajansen.obscameraswitcher.ObsCameraSwitcherPlugin
+import objects.OBSClient
+import objects.TScene
 import objects.TSource
 import objects.notifications.Notifications
 import objects.que.JsonQue
-import themes.Theme
+import objects.que.QueItem
 import java.awt.Color
 import java.util.logging.Logger
-import javax.swing.JLabel
 
 class ObsCameraSwitchQueItem(override val plugin: ObsCameraSwitcherPlugin, val scene: TScene, val source: TSource) :
-    QueItem {
+        QueItem {
 
     private val logger = Logger.getLogger(ObsCameraSwitchQueItem::class.java.name)
 
@@ -50,8 +46,6 @@ class ObsCameraSwitchQueItem(override val plugin: ObsCameraSwitcherPlugin, val s
             return
         }
 
-        controller.setSourceVisibility(scene.name, source.name, true) {
-            plugin.hideAllCameras(exceptSource = source)
-        }
+        plugin.activateCamera(source.name)
     }
 }

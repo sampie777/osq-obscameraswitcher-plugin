@@ -18,17 +18,19 @@ object PluginProperties {
     private val properties = Properties()
 
     var cameraSceneName: String = "Cameras"
+    var switchUsingVisibility: Boolean = false
 
     fun load() {
-        logger.info("Loading scene timer plugin properties from: $propertiesFilePath")
+        logger.info("Loading plugin properties from: $propertiesFilePath")
 
         if (File(propertiesFilePath).exists()) {
             FileInputStream(propertiesFilePath).use { properties.load(it) }
         } else {
-            logger.info("No scene timer plugin properties file found, using defaults")
+            logger.info("No scene plugin properties file found, using defaults")
         }
 
         cameraSceneName = properties.getProperty("cameraSceneName", cameraSceneName)
+        switchUsingVisibility = properties.getProperty("switchUsingVisibility", switchUsingVisibility.toString())!!.toBoolean()
 
         if (!File(propertiesFilePath).exists()) {
             save()
@@ -36,19 +38,20 @@ object PluginProperties {
     }
 
     fun save() {
-        logger.info("Saving scene timer plugin properties")
+        logger.info("Saving plugin properties")
         properties.setProperty("cameraSceneName", cameraSceneName)
+        properties.setProperty("switchUsingVisibility", switchUsingVisibility.toString())
 
         if (!writeToFile) {
             return
         }
 
-        logger.info("Saving to scene timer plugin properties file: $propertiesFilePath")
+        logger.info("Saving to plugin properties file: $propertiesFilePath")
 
         FileOutputStream(propertiesFilePath).use { fileOutputStream ->
             properties.store(
                 fileOutputStream,
-                "User properties for Scene Timer plugin"
+                "User properties for plugin"
             )
         }
     }

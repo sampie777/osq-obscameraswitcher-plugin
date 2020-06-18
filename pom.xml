@@ -6,7 +6,7 @@
 
     <groupId>nl.sajansen</groupId>
     <artifactId>osq-obscameraswitcher-plugin</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OSQ OBS Camera Switcher Plugin</name>

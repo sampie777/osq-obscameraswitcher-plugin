@@ -3,17 +3,17 @@ package nl.sajansen.obscameraswitcher
 import GUI
 import gui.Refreshable
 import gui.plugins.config.ConfigActionPanel
+import gui.plugins.config.ConfigWindow
 import gui.utils.DefaultSourcesList
 import gui.utils.createImageIcon
 import gui.utils.getMainFrameComponent
 import gui.utils.getMainMenu
+import net.twasi.obsremotejava.requests.ReorderSceneItems.ReorderSceneItemsRequest
 import nl.sajansen.obscameraswitcher.config.ConfigEditPanel
-import gui.plugins.config.ConfigWindow
 import nl.sajansen.obscameraswitcher.queItems.ObsCameraSwitchQueItem
 import objects.OBSClient
 import objects.OBSState
 import objects.TScene
-import objects.TSource
 import objects.notifications.Notifications
 import objects.que.JsonQue
 import objects.que.QueItem
@@ -60,10 +60,10 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         val settingsItem = JMenuItem("Settings")
         settingsItem.addActionListener {
             ConfigWindow(
-                getMainFrameComponent(getMainMenu(menu)),
-                "OBS Camera Switcher Plugin Settings",
-                ConfigEditPanel(),
-                ConfigActionPanel(null) { PluginProperties.save() }
+                    getMainFrameComponent(getMainMenu(menu)),
+                    "OBS Camera Switcher Plugin Settings",
+                    ConfigEditPanel(),
+                    ConfigActionPanel(null) { PluginProperties.save() }
             )
         }
         menu.add(settingsItem)
@@ -105,11 +105,11 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         }
 
         cameraSourcesList.setListData(cameraScene!!.sources.map { ObsCameraSwitchQueItem(this, cameraScene!!, it) }
-            .toTypedArray())
+                .toTypedArray())
         cameraSourcesList.repaint()
     }
 
-    fun hideAllCameras(exceptSource: TSource? = null) {
+    fun hideAllCameras(exceptSourceName: String? = null) {
         val controller = OBSClient.getController()
         if (controller == null) {
             logger.info("OBS controller is null, cannot activate Camera Switch Queue Item")
@@ -124,9 +124,36 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         }
 
         cameraScene!!.sources
-            .filter { it.name != exceptSource?.name }
-            .forEach {
-                controller.setSourceVisibility(cameraScene?.name, it.name, false) {}
+                .filter { it.name != exceptSourceName }
+                .forEach {
+                    controller.setSourceVisibility(cameraSceneName, it.name, false) {}
+                }
+    }
+
+    fun activateCamera(sourceName: String) {
+        val controller = OBSClient.getController()
+        if (controller == null) {
+            logger.info("OBS controller is null, cannot activate Camera Switch Queue Item")
+            Notifications.add("Cannot switch camera. Make sure OBS is connected.", "OBS Camera Switcher")
+            return
+        }
+
+        if (PluginProperties.switchUsingVisibility) {
+            controller.setSourceVisibility(cameraSceneName, sourceName, true) {
+                hideAllCameras(exceptSourceName = sourceName)
             }
+        } else {
+            val cameraSource = cameraScene!!.sources.find { it.name == sourceName }
+            if (cameraSource == null) {
+                Notifications.add("Cannot find camera '$sourceName' in scene sources", "OBS Camera Switcher")
+                return
+            }
+
+            val sources = listOf(cameraSource) + cameraScene!!.sources.filter { it != cameraSource }
+
+            val obsItems = sources.map { ReorderSceneItemsRequest(null, null, null).Item(null, it.name) }
+
+            controller.reorderSceneItems(cameraSceneName, obsItems) {}
+        }
     }
 }
