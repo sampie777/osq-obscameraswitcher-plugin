@@ -5,7 +5,7 @@ import objects.OBSClient
 import objects.TScene
 import objects.TSource
 import objects.notifications.Notifications
-import objects.que.JsonQue
+import objects.que.JsonQueue
 import objects.que.QueItem
 import java.awt.Color
 import java.util.logging.Logger
@@ -16,7 +16,7 @@ class ObsCameraSwitchQueItem(override val plugin: ObsCameraSwitcherPlugin, val s
     private val logger = Logger.getLogger(ObsCameraSwitchQueItem::class.java.name)
 
     companion object {
-        fun fromJson(plugin: ObsCameraSwitcherPlugin, jsonQueItem: JsonQue.QueItem): ObsCameraSwitchQueItem {
+        fun fromJson(plugin: ObsCameraSwitcherPlugin, jsonQueItem: JsonQueue.QueueItem): ObsCameraSwitchQueItem {
             val scene = TScene(jsonQueItem.data["scene"])
             val source = TSource(jsonQueItem.data["source"]!!)
             val queItem = ObsCameraSwitchQueItem(plugin, scene, source)
@@ -31,7 +31,7 @@ class ObsCameraSwitchQueItem(override val plugin: ObsCameraSwitcherPlugin, val s
 
     override fun toString(): String = renderText()
 
-    override fun toJson(): JsonQue.QueItem {
+    override fun toJson(): JsonQueue.QueueItem {
         val jsonQueItem = super.toJson()
         jsonQueItem.data["scene"] = scene.name
         jsonQueItem.data["source"] = source.name

@@ -15,7 +15,7 @@ import objects.OBSClient
 import objects.OBSState
 import objects.TScene
 import objects.notifications.Notifications
-import objects.que.JsonQue
+import objects.que.JsonQueue
 import objects.que.QueItem
 import plugins.common.QueItemBasePlugin
 import java.awt.BorderLayout
@@ -88,7 +88,7 @@ class ObsCameraSwitcherPlugin : QueItemBasePlugin, Refreshable {
         TODO("Not implemented")
     }
 
-    override fun jsonToQueItem(jsonQueItem: JsonQue.QueItem): QueItem {
+    override fun jsonToQueItem(jsonQueItem: JsonQueue.QueueItem): QueItem {
         return when (jsonQueItem.className) {
             ObsCameraSwitchQueItem::class.java.simpleName -> ObsCameraSwitchQueItem.fromJson(this, jsonQueItem)
             else -> throw IllegalArgumentException("Invalid OBS Camera Switcher queue item: ${jsonQueItem.className}")
